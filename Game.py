@@ -11,7 +11,7 @@ class Things:
     def thing_life_reduce(self):
         if self.thing_life - 1 != 0: 
             self.thing_life = self.thing_life - 1
-        elif self.thing_life - 1 == 0 and self.type != 'Защита':
+        else:
             print(f'Оружие {self.name} разрушено')
             self.attack_thing = 0
             self.thing_life = 0
@@ -37,24 +37,30 @@ class Person:
             
             
 
-    def calc_attack_damage(self):
+    def calc_attack_damage(self, other):
         extra_wearpon_damage = 0
         finalProtection = 0
-        for thing in self.wearpons:
+        for thing in other.wearpons:
             if thing.thing_life > 0:
                 
                 finalProtection = finalProtection + thing.defence_thing
+        for thing in self.wearpons:
+            if thing.thing_life > 0:
                 extra_wearpon_damage = extra_wearpon_damage + thing.attack_thing
-        
+
         total_attack_damage = self.attack_damage + extra_wearpon_damage
         total_attack_damage = total_attack_damage - self.attack_damage * finalProtection #Тут бубет процент защиты, который получается от всех навесов
         return total_attack_damage
         
     
     def attacks(self, other):
-        other.hp = other.hp - self.calc_attack_damage()
+        other.hp = other.hp - self.calc_attack_damage(other)
         for thing in self.wearpons:
-            thing.thing_life_reduce()
+            if thing.type != 'Защита':
+                thing.thing_life_reduce()
+        for thing in other.wearpons:
+            if thing.type == 'Защита':
+                thing.thing_life_reduce()
         
 
 
@@ -81,7 +87,6 @@ def Arena(people, things):
         for i in range(n):
             pos_thing = randint(0, len(things)-1)
             things_for_person.append(things[pos_thing])
-            # print(things_for_person)
             
             things.pop(pos_thing)
         person.set_things(things_for_person)
@@ -93,7 +98,7 @@ def Arena(people, things):
         print('-------------------------\n')
 
     for i in people:
-        print(f'{i.name}: HP = {i.hp}; Урон = {i.calc_attack_damage()}')
+        print(f'{i.name}: HP = {i.hp}')
     
     print('----------------БОЙ-----------------\n')
     
@@ -106,19 +111,17 @@ def Arena(people, things):
         w = people[w_index]
         print(f'-------Пара: {p.name}, {w.name}-------')
     
-        print(f'HP {w.name}: {w.hp}, HP {p.name}: {p.hp}')
-    
         while p.hp > 0 and w.hp > 0:
-            print(f'{w.name} нападает и наносит урон {w.calc_attack_damage()}')
+            print(f'HP {w.name}: {w.hp}, HP {p.name}: {p.hp}')
+            print(f'{w.name} нападает и наносит урон {w.calc_attack_damage(p)}')
             w.attacks(p)
             if p.hp <= 0:
                 break
             print(f'HP {w.name}: {w.hp}, HP {p.name}: {p.hp}')
-            print(f'{p.name} нападает и наносит урон {p.calc_attack_damage()}')
+            print(f'{p.name} нападает и наносит урон {p.calc_attack_damage(w)}\n')
             p.attacks(w)
             if w.hp <= 0:
                 break
-            print(f'HP {w.name}: {w.hp}, HP {p.name}: {p.hp}')
         
         if p.hp <= 0:
             print(f'Победил {w.name}\n')
