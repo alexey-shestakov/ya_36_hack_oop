@@ -12,7 +12,7 @@ class Things:
         if self.thing_life - 1 != 0: 
             self.thing_life = self.thing_life - 1
         else:
-            print(f'Оружие {self.name} разрушено')
+            print(f'!!Снаряжение {self.name} разрушено!!')
             self.attack_thing = 0
             self.thing_life = 0
             self.defence_thing = 0
@@ -49,7 +49,7 @@ class Person:
                 extra_wearpon_damage = extra_wearpon_damage + thing.attack_thing
 
         total_attack_damage = self.attack_damage + extra_wearpon_damage
-        total_attack_damage = total_attack_damage - self.attack_damage * finalProtection #Тут бубет процент защиты, который получается от всех навесов
+        total_attack_damage = total_attack_damage - total_attack_damage * finalProtection #Тут бубет процент защиты, который получается от всех навесов
         return total_attack_damage
         
     
